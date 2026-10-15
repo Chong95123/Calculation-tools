@@ -1,31 +1,29 @@
 // ====================== DATA ======================
 const costData = {
-  hacking: { name: "Hacking & Disposal", none:[0,0], light:[1500,3000], moderate:[3000,5500], extensive:[5500,9000],
-    desc:{none:"", light:"Remove some tiles, cabinets or minor partitions only", moderate:"Hack kitchen + 1-2 bathrooms + some flooring", extensive:"Full unit hacking (most walls, all wet areas, old flooring)"} },
-  masonry: { name: "Masonry / Tiling & Waterproofing", none:[0,0], light:[3000,6000], moderate:[6000,12000], extensive:[12000,20000],
-    desc:{none:"", light:"Touch-up tiling or small area only", moderate:"Kitchen + bathrooms full tiling + waterproofing", extensive:"Whole house tiling + full waterproofing"} },
-  carpentry: { name: "Carpentry (Kitchen + Wardrobes + Storage)", none:[0,0], light:[8000,15000], moderate:[15000,25000], extensive:[25000,40000],
-    desc:{none:"", light:"Basic kitchen cabinets + 1 wardrobe only", moderate:"Full kitchen + 2-3 wardrobes + TV console", extensive:"Full custom carpentry throughout the house"} },
-  electrical: { name: "Electrical & Lighting", none:[0,0], light:[2000,4000], moderate:[4000,7000], extensive:[7000,12000],
-    desc:{none:"", light:"Add some power points & basic lighting", moderate:"Partial rewiring + new lighting points", extensive:"Full rewiring of the unit"} },
-  plumbing: { name: "Plumbing", none:[0,0], light:[1500,3500], moderate:[3500,6000], extensive:[6000,10000],
-    desc:{none:"", light:"Minor pipe changes", moderate:"Kitchen + bathroom plumbing overhaul", extensive:"Full unit re-piping"} },
-  painting: { name: "Painting", none:[0,0], light:[1200,2500], moderate:[2500,4000], extensive:[4000,6500],
-    desc:{none:"", light:"Touch-up or 1-2 rooms only", moderate:"Whole house standard paint", extensive:"Whole house + feature walls"} },
-  ceiling: { name: "Ceiling / Partition / False Ceiling", none:[0,0], light:[1000,2500], moderate:[2500,5000], extensive:[5000,9000],
+  hacking: { name: "Hacking & Disposal", none:[0,0], light:[1800,3500], moderate:[4000,7500], extensive:[8000,15000],
+    desc:{none:"", light:"Minor removal of tiles / cabinets / small partitions", moderate:"Kitchen + 1-2 bathrooms + partial flooring", extensive:"Full unit hacking"} },
+  masonry: { name: "Masonry / Tiling & Waterproofing", none:[0,0], light:[3500,7000], moderate:[9000,18000], extensive:[20000,35000],
+    desc:{none:"", light:"Touch-up or small area tiling", moderate:"Kitchen + bathrooms full tiling + waterproofing", extensive:"Whole house tiling + full waterproofing"} },
+  carpentry: { name: "Carpentry (Kitchen + Wardrobes + Storage)", none:[0,0], light:[9000,16000], moderate:[20000,38000], extensive:[40000,65000],
+    desc:{none:"", light:"Basic kitchen + 1 wardrobe", moderate:"Full kitchen + 2-3 wardrobes + TV console", extensive:"Full custom carpentry"} },
+  electrical: { name: "Electrical & Lighting", none:[0,0], light:[2500,4500], moderate:[5500,10000], extensive:[11000,18000],
+    desc:{none:"", light:"Add power points & basic lighting", moderate:"Partial rewiring + new lighting", extensive:"Full rewiring"} },
+  plumbing: { name: "Plumbing", none:[0,0], light:[1800,3500], moderate:[4500,8500], extensive:[9000,15000],
+    desc:{none:"", light:"Minor pipe changes", moderate:"Kitchen + bathroom overhaul", extensive:"Full unit re-piping"} },
+  painting: { name: "Painting", none:[0,0], light:[1800,3200], moderate:[4000,6500], extensive:[7000,11000],
+    desc:{none:"", light:"Touch-up or 1-2 rooms", moderate:"Whole house standard paint", extensive:"Whole house + feature walls"} },
+  ceiling: { name: "Ceiling / Partition / False Ceiling", none:[0,0], light:[1800,3500], moderate:[4500,9500], extensive:[10000,18000],
     desc:{none:"", light:"Simple cornice or small area", moderate:"False ceiling in living + some rooms", extensive:"Full false ceiling + partitions"} },
-  windows: { name: "Windows / Doors / Grilles", none:[0,0], light:[1500,3500], moderate:[3500,6000], extensive:[6000,10000],
-    desc:{none:"", light:"Replace 1-2 doors or add grilles", moderate:"New main door + several internal doors", extensive:"Full set of windows / doors / grilles"} },
-  cleaning: { name: "Final Cleaning & Disposal", none:[0,0], light:[400,800], moderate:[800,1500], extensive:[1500,2500],
+  windows: { name: "Windows / Doors / Grilles", none:[0,0], light:[2500,4500], moderate:[6000,11000], extensive:[12000,20000],
+    desc:{none:"", light:"Replace 1-2 doors or add grilles", moderate:"New main door + several doors/grilles", extensive:"Full set"} },
+  aircon: { name: "Air-Conditioning (Supply + Install)", none:[0,0], light:[3000,6000], moderate:[8000,14000], extensive:[15000,25000],
+    desc:{none:"", light:"1–2 units", moderate:"3–4 units", extensive:"Full house / multi-split"} },
+  cleaning: { name: "Final Cleaning & Disposal", none:[0,0], light:[500,900], moderate:[1000,2000], extensive:[2200,3500],
     desc:{none:"", light:"Basic post-reno cleaning", moderate:"Standard full cleaning", extensive:"Deep cleaning + extra disposal"} }
 };
 
-const propertyMultiplier = {
-  "apartment-new": 0.85,
-  "apartment-resale": 1.0,
-  "condo-new": 0.90,
-  "condo-resale": 1.15
-};
+const propertyMultiplier = { "apartment-new":0.85, "apartment-resale":1.0, "condo-new":0.90, "condo-resale":1.15 };
+const materialMultiplier = { budget:0.85, mid:1.0, premium:1.35 };
 
 // ====================== MENU ======================
 document.querySelectorAll('.menu-btn').forEach(btn => {
@@ -37,9 +35,8 @@ document.querySelectorAll('.menu-btn').forEach(btn => {
   });
 });
 
-// ====================== HELPERS ======================
 function formatMoney(num) {
-  return "RM " + Math.round(num).toLocaleString("en-MY");
+  return "RM " + Math.round(num || 0).toLocaleString("en-MY");
 }
 
 function getAreaInSqft() {
@@ -48,7 +45,7 @@ function getAreaInSqft() {
   return area;
 }
 
-// ====================== RENOVATION CALCULATOR ======================
+// ====================== RENOVATION ======================
 function renderCategories() {
   const container = document.getElementById("categories");
   if (!container) return;
@@ -67,8 +64,7 @@ function renderCategories() {
           <option value="extensive">Extensive</option>
         </select>
       </div>
-      <div class="intensity-desc" id="desc-${key}"></div>
-    `;
+      <div class="intensity-desc" id="desc-${key}"></div>`;
     container.appendChild(div);
     const select = div.querySelector("select");
     select.addEventListener("change", () => updateDescription(key, select.value));
@@ -80,44 +76,36 @@ function updateDescription(key, intensity) {
   const el = document.getElementById(`desc-${key}`);
   if (!el) return;
   const text = costData[key].desc[intensity] || "";
-  if (text) {
-    el.textContent = text;
-    el.classList.add("show");
-  } else {
-    el.classList.remove("show");
-  }
+  el.textContent = text;
+  text ? el.classList.add("show") : el.classList.remove("show");
 }
 
 function calculate() {
   const propMult = propertyMultiplier[document.getElementById("propertyType").value] || 1;
-  const sizeMult = Math.pow(getAreaInSqft() / 1000, 0.85);
-  const finalMult = propMult * sizeMult;
+  const matMult = materialMultiplier[document.getElementById("materialQuality").value] || 1;
+  const contingency = parseFloat(document.getElementById("contingency").value) || 0.15;
+  const areaSqft = getAreaInSqft();
+  const sizeMult = Math.pow(areaSqft / 1000, 0.85);
+  const finalMult = propMult * matMult * sizeMult;
 
   let totalLow = 0, totalHigh = 0;
   const breakdown = [];
-
   Object.keys(costData).forEach(key => {
     const intensity = document.getElementById(key).value;
     const costs = costData[key][intensity];
     const low = costs[0] * finalMult;
     const high = costs[1] * finalMult;
-    totalLow += low;
-    totalHigh += high;
+    totalLow += low; totalHigh += high;
     if (intensity !== "none") {
-      breakdown.push({
-        name: costData[key].name,
-        intensity: intensity.charAt(0).toUpperCase() + intensity.slice(1),
-        low, high
-      });
+      breakdown.push({ name: costData[key].name, intensity: intensity.charAt(0).toUpperCase() + intensity.slice(1), low, high });
     }
   });
-
-  totalLow *= 1.10;
-  totalHigh *= 1.10;
+  totalLow *= (1 + contingency);
+  totalHigh *= (1 + contingency);
 
   document.getElementById("totalRange").textContent = `${formatMoney(totalLow)} – ${formatMoney(totalHigh)}`;
-  document.getElementById("areaInfo").textContent = 
-    `${document.getElementById("floorArea").value} ${document.getElementById("areaUnit").value} • ${document.getElementById("bedrooms").value} Bed • ${document.getElementById("bathrooms").value} Bath`;
+  document.getElementById("areaInfo").textContent = `${document.getElementById("floorArea").value} ${document.getElementById("areaUnit").value} (${Math.round(areaSqft)} sqft) • ${document.getElementById("bedrooms").value} Bed • ${document.getElementById("bathrooms").value} Bath`;
+  document.getElementById("psfInfo").textContent = `≈ ${formatMoney(((totalLow + totalHigh) / 2) / areaSqft)} per sqft`;
 
   const tbody = document.getElementById("breakdownBody");
   tbody.innerHTML = "";
@@ -126,117 +114,10 @@ function calculate() {
     tr.innerHTML = `<td>${item.name}</td><td>${item.intensity}</td><td>${formatMoney(item.low)} – ${formatMoney(item.high)}</td>`;
     tbody.appendChild(tr);
   });
-
   document.getElementById("resultSection").style.display = "block";
 }
 
-// ====================== CHECKLIST ======================
-let items = JSON.parse(localStorage.getItem("renoChecklist") || "[]");
-let waitingForClick = false;
-let tempItem = null;
-
-function saveItems() {
-  localStorage.setItem("renoChecklist", JSON.stringify(items));
-}
-
-document.getElementById("planUpload")?.addEventListener("change", function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const img = document.getElementById("planImage");
-    img.src = event.target.result;
-    img.style.display = "block";
-    localStorage.setItem("renoPlanImage", event.target.result);
-  };
-  reader.readAsDataURL(file);
-});
-
-window.addEventListener("load", () => {
-  const saved = localStorage.getItem("renoPlanImage");
-  if (saved) {
-    const img = document.getElementById("planImage");
-    img.src = saved;
-    img.style.display = "block";
-  }
-  renderMarkers();
-  renderChecklist();
-});
-
-document.getElementById("addItemBtn")?.addEventListener("click", function() {
-  const area = document.getElementById("itemArea").value;
-  const name = document.getElementById("itemName").value.trim();
-  if (!name) return alert("Please enter item name");
-  tempItem = { area, name, done: false, x: 0, y: 0 };
-  waitingForClick = true;
-  alert("Now click on the floor plan to place the marker");
-});
-
-document.getElementById("planContainer")?.addEventListener("click", function(e) {
-  if (!waitingForClick || !tempItem) return;
-  const rect = document.getElementById("planImage").getBoundingClientRect();
-  const x = ((e.clientX - rect.left) / rect.width) * 100;
-  const y = ((e.clientY - rect.top) / rect.height) * 100;
-  tempItem.x = x;
-  tempItem.y = y;
-  items.push({ ...tempItem, id: Date.now() });
-  waitingForClick = false;
-  tempItem = null;
-  document.getElementById("itemName").value = "";
-  saveItems();
-  renderMarkers();
-  renderChecklist();
-});
-
-function renderMarkers() {
-  const container = document.getElementById("markers");
-  if (!container) return;
-  container.innerHTML = "";
-  items.forEach(item => {
-    const m = document.createElement("div");
-    m.className = "marker" + (item.done ? " done" : "");
-    m.style.left = item.x + "%";
-    m.style.top = item.y + "%";
-    m.innerHTML = `<div class="marker-label">${item.name}</div>`;
-    container.appendChild(m);
-  });
-}
-
-function renderChecklist() {
-  const container = document.getElementById("checklistItems");
-  if (!container) return;
-  if (items.length === 0) {
-    container.innerHTML = `<p class="hint">No items yet.</p>`;
-    return;
-  }
-  container.innerHTML = "";
-  items.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "checklist-item";
-    div.innerHTML = `
-      <input type="checkbox" id="check-${item.id}" ${item.done ? "checked" : ""}>
-      <label for="check-${item.id}">${item.name}</label>
-      <span class="item-area">${item.area}</span>
-      <button class="delete-btn" data-id="${item.id}">Delete</button>
-    `;
-    container.appendChild(div);
-
-    div.querySelector("input").addEventListener("change", function() {
-      item.done = this.checked;
-      saveItems();
-      renderMarkers();
-    });
-
-    div.querySelector(".delete-btn").addEventListener("click", function() {
-      items = items.filter(i => i.id !== Number(this.dataset.id));
-      saveItems();
-      renderMarkers();
-      renderChecklist();
-    });
-  });
-}
-
-// ====================== LOAN & DSR ======================
+// ====================== LOAN (Interactive / Live) ======================
 let commitments = [
   { id: 1, name: "Car Loan", amount: 0 },
   { id: 2, name: "Personal Loan", amount: 0 },
@@ -253,27 +134,28 @@ function renderCommitments() {
     row.innerHTML = `
       <input type="text" value="${c.name}" class="commit-name" data-id="${c.id}">
       <input type="number" value="${c.amount}" class="commit-amount" data-id="${c.id}" min="0">
-      <button type="button" class="remove-commit" data-id="${c.id}">×</button>
-    `;
+      <button type="button" class="remove-commit" data-id="${c.id}">×</button>`;
     container.appendChild(row);
   });
-
   container.querySelectorAll(".commit-name").forEach(inp => {
     inp.addEventListener("change", function() {
       const item = commitments.find(c => c.id === Number(this.dataset.id));
       if (item) item.name = this.value;
+      calcLoanLive();
     });
   });
   container.querySelectorAll(".commit-amount").forEach(inp => {
     inp.addEventListener("input", function() {
       const item = commitments.find(c => c.id === Number(this.dataset.id));
       if (item) item.amount = parseFloat(this.value) || 0;
+      calcLoanLive();
     });
   });
   container.querySelectorAll(".remove-commit").forEach(btn => {
     btn.addEventListener("click", function() {
       commitments = commitments.filter(c => c.id !== Number(this.dataset.id));
       renderCommitments();
+      calcLoanLive();
     });
   });
 }
@@ -283,12 +165,13 @@ document.getElementById("addCommitBtn")?.addEventListener("click", () => {
   renderCommitments();
 });
 
-document.getElementById("calcLoanBtn")?.addEventListener("click", function() {
+function calcLoanLive() {
   const salary = parseFloat(document.getElementById("monthlySalary").value) || 0;
   const other = parseFloat(document.getElementById("otherIncome").value) || 0;
   const totalIncome = salary + other;
   const totalCommit = commitments.reduce((s, c) => s + (c.amount || 0), 0);
 
+  const propertyPrice = parseFloat(document.getElementById("simPropertyPrice").value) || 0;
   const P = parseFloat(document.getElementById("loanAmount").value) || 0;
   const annualRate = parseFloat(document.getElementById("interestRate").value) / 100 || 0;
   const years = parseFloat(document.getElementById("loanYears").value) || 30;
@@ -304,83 +187,189 @@ document.getElementById("calcLoanBtn")?.addEventListener("click", function() {
 
   const totalPay = monthly * n;
   const totalInterest = totalPay - P;
-
-  // DSR
   const dsr = totalIncome > 0 ? ((totalCommit + monthly) / totalIncome) * 100 : 0;
 
-  // Display
+  // Display basic numbers
   document.getElementById("monthlyPayment").textContent = formatMoney(monthly);
   document.getElementById("totalPayment").textContent = formatMoney(totalPay);
   document.getElementById("totalInterest").textContent = formatMoney(totalInterest);
 
-  const dsrBox = document.getElementById("dsrBox");
+  // ===== DSR Bar & Colour =====
   const dsrValue = document.getElementById("dsrValue");
+  const dsrBar = document.getElementById("dsrBar");
   const dsrStatus = document.getElementById("dsrStatus");
-  dsrValue.textContent = dsr.toFixed(1) + "%";
 
-  dsrBox.classList.remove("excellent", "good", "risk");
+  dsrValue.textContent = dsr.toFixed(1) + "%";
+  const barWidth = Math.min(dsr, 100);
+  dsrBar.style.width = barWidth + "%";
+
   if (dsr <= 60) {
-    dsrBox.classList.add("excellent");
-    dsrStatus.textContent = "Excellent (High approval chance)";
+    dsrBar.style.background = "#22c55e";
+    dsrStatus.textContent = "Excellent";
+    dsrStatus.style.color = "#166534";
   } else if (dsr <= 70) {
-    dsrBox.classList.add("good");
+    dsrBar.style.background = "#eab308";
     dsrStatus.textContent = "Acceptable / Borderline";
+    dsrStatus.style.color = "#854d0e";
   } else {
-    dsrBox.classList.add("risk");
-    dsrStatus.textContent = "High Risk (May need joint applicant)";
+    dsrBar.style.background = "#ef4444";
+    dsrStatus.textContent = "High Risk";
+    dsrStatus.style.color = "#991b1b";
   }
 
-  // Your original multipliers
-  document.getElementById("maxHousePrice").textContent = formatMoney(totalIncome * 60);
-  document.getElementById("loanLimit").textContent = formatMoney(totalIncome * 0.30);
-  document.getElementById("totalLimit").textContent = formatMoney(totalIncome * 0.35);
-  document.getElementById("cashNeeded").textContent = formatMoney(P * 0.30);
+  // ===== Affordability numbers =====
+  const capability = totalIncome * 60;
+  const loanLimit = totalIncome * 0.30;
+  const totalLimit = totalIncome * 0.35;
+  const cashNeeded = P * 0.30;
 
-  document.getElementById("loanResult").style.display = "block";
+  document.getElementById("maxHousePrice").textContent = formatMoney(capability);
+  document.getElementById("loanLimit").textContent = formatMoney(loanLimit);
+  document.getElementById("totalLimit").textContent = formatMoney(totalLimit);
+  document.getElementById("cashNeeded").textContent = formatMoney(cashNeeded);
+
+  // ===== Colour the 4 boxes =====
+  const boxCap = document.getElementById("boxCapability");
+  const boxLoan = document.getElementById("boxLoanLimit");
+  const boxTotal = document.getElementById("boxTotalLimit");
+  const boxCash = document.getElementById("boxCash");
+
+  // Reset
+  [boxCap, boxLoan, boxTotal, boxCash].forEach(b => {
+    b.classList.remove("good", "caution", "bad");
+  });
+
+  // 1. Capability vs Property Price
+  if (propertyPrice <= capability) {
+    boxCap.classList.add("good");
+    document.getElementById("explainCapability").textContent = "Property price is within comfortable range";
+  } else if (propertyPrice <= capability * 1.25) {
+    boxCap.classList.add("caution");
+    document.getElementById("explainCapability").textContent = "Property price is slightly above comfortable limit";
+  } else {
+    boxCap.classList.add("bad");
+    document.getElementById("explainCapability").textContent = "Property price is significantly higher than recommended";
+  }
+
+  // 2. Loan Limit vs Monthly Payment
+  if (monthly <= loanLimit) {
+    boxLoan.classList.add("good");
+    document.getElementById("explainLoanLimit").textContent = "Monthly payment is within comfortable limit";
+  } else if (monthly <= loanLimit * 1.2) {
+    boxLoan.classList.add("caution");
+    document.getElementById("explainLoanLimit").textContent = "Monthly payment is slightly high";
+  } else {
+    boxLoan.classList.add("bad");
+    document.getElementById("explainLoanLimit").textContent = "Monthly payment is too high for this salary";
+  }
+
+  // 3. Total Limit vs (Payment + Commitments)
+  const totalDebt = monthly + totalCommit;
+  if (totalDebt <= totalLimit) {
+    boxTotal.classList.add("good");
+    document.getElementById("explainTotalLimit").textContent = "Total debts are within safe limit";
+  } else if (totalDebt <= totalLimit * 1.2) {
+    boxTotal.classList.add("caution");
+    document.getElementById("explainTotalLimit").textContent = "Total debts are slightly high";
+  } else {
+    boxTotal.classList.add("bad");
+    document.getElementById("explainTotalLimit").textContent = "Total debts exceed recommended limit";
+  }
+
+  // 4. Cash box - neutral
+  boxCash.classList.add("good");
+
+  // ===== Overall Advice =====
+  const adviceBox = document.getElementById("overallAdvice");
+  const adviceTitle = document.getElementById("adviceTitle");
+  const adviceDesc = document.getElementById("adviceDesc");
+
+  adviceBox.classList.remove("good", "caution", "bad");
+
+  const badCount = [boxCap, boxLoan, boxTotal].filter(b => b.classList.contains("bad")).length;
+  const cautionCount = [boxCap, boxLoan, boxTotal].filter(b => b.classList.contains("caution")).length;
+
+  if (badCount >= 2 || (badCount >= 1 && monthly > loanLimit * 1.5)) {
+    adviceBox.classList.add("bad");
+    adviceTitle.textContent = "Not Recommended";
+    adviceDesc.textContent = "The property price and/or monthly payment are significantly higher than the comfortable limits for this salary.";
+  } else if (badCount === 1 || cautionCount >= 2) {
+    adviceBox.classList.add("caution");
+    adviceTitle.textContent = "Caution – Review Carefully";
+    adviceDesc.textContent = "Some numbers are above the comfortable range. Consider a lower loan amount or longer discussion with the bank.";
+  } else {
+    adviceBox.classList.add("good");
+    adviceTitle.textContent = "Looks Manageable";
+    adviceDesc.textContent = "Based on the guidelines, this loan appears to be within a reasonable range for the stated salary.";
+  }
+}
+
+// Live update on input
+["monthlySalary","otherIncome","loanAmount","interestRate","loanYears","simPropertyPrice"].forEach(id => {
+  document.getElementById(id)?.addEventListener("input", calcLoanLive);
 });
 
-// ====================== ENTRY COST ======================
+// ====================== ENTRY ======================
 document.getElementById("calcEntryBtn")?.addEventListener("click", function() {
   const price = parseFloat(document.getElementById("entryPrice").value) || 0;
   const downPct = parseFloat(document.getElementById("downPercent").value) || 10;
   const loan = parseFloat(document.getElementById("entryLoan").value) || 0;
-
   const downPayment = price * (downPct / 100);
-
-  // Stamp Duty (MOT) - Malaysian citizen/PR tiers
   let stampDuty = 0;
-  if (price <= 100000) {
-    stampDuty = price * 0.01;
-  } else if (price <= 500000) {
-    stampDuty = 1000 + (price - 100000) * 0.02;
-  } else if (price <= 1000000) {
-    stampDuty = 9000 + (price - 500000) * 0.03;
-  } else {
-    stampDuty = 24000 + (price - 1000000) * 0.04;
-  }
-
-  const loanStamp = loan * 0.005;               // 0.5%
-  const legalFee = price * 0.012;               // rough 1.2%
-  const valuation = Math.min(Math.max(price * 0.002, 800), 2500); // rough
-
+  if (price <= 100000) stampDuty = price * 0.01;
+  else if (price <= 500000) stampDuty = 1000 + (price - 100000) * 0.02;
+  else if (price <= 1000000) stampDuty = 9000 + (price - 500000) * 0.03;
+  else stampDuty = 24000 + (price - 1000000) * 0.04;
+  const loanStamp = loan * 0.005;
+  const legalFee = price * 0.012;
+  const valuation = Math.min(Math.max(price * 0.002, 800), 2500);
   const total = downPayment + stampDuty + loanStamp + legalFee + valuation;
 
   document.getElementById("totalCash").textContent = formatMoney(total);
-
-  const tbody = document.getElementById("entryBreakdown");
-  tbody.innerHTML = `
+  document.getElementById("entryBreakdown").innerHTML = `
     <tr><td>Down Payment (${downPct}%)</td><td>${formatMoney(downPayment)}</td></tr>
     <tr><td>Stamp Duty (MOT)</td><td>${formatMoney(stampDuty)}</td></tr>
-    <tr><td>Loan Agreement Stamp Duty (0.5%)</td><td>${formatMoney(loanStamp)}</td></tr>
-    <tr><td>Legal Fees (estimate)</td><td>${formatMoney(legalFee)}</td></tr>
-    <tr><td>Valuation Fee (estimate)</td><td>${formatMoney(valuation)}</td></tr>
-    <tr style="font-weight:700;"><td>Total Upfront Cash</td><td>${formatMoney(total)}</td></tr>
-  `;
-
+    <tr><td>Loan Stamp Duty (0.5%)</td><td>${formatMoney(loanStamp)}</td></tr>
+    <tr><td>Legal Fees (est.)</td><td>${formatMoney(legalFee)}</td></tr>
+    <tr><td>Valuation Fee (est.)</td><td>${formatMoney(valuation)}</td></tr>
+    <tr style="font-weight:700;"><td>Total Upfront Cash</td><td>${formatMoney(total)}</td></tr>`;
   document.getElementById("entryResult").style.display = "block";
 });
 
-// ====================== RENTAL YIELD ======================
+// ====================== EXIT COST ======================
+document.getElementById("calcExitBtn")?.addEventListener("click", function() {
+  const sell = parseFloat(document.getElementById("exitPrice").value) || 0;
+  const purchase = parseFloat(document.getElementById("exitPurchase").value) || 0;
+  const outstanding = parseFloat(document.getElementById("exitLoan").value) || 0;
+  const years = parseInt(document.getElementById("exitYears").value) || 6;
+  const commissionPct = parseFloat(document.getElementById("exitCommission").value) || 2.5;
+
+  const gain = Math.max(sell - purchase, 0);
+  // Simplified RPGT for Malaysian citizen (approx)
+  let rpgtRate = 0;
+  if (years <= 3) rpgtRate = 0.30;
+  else if (years <= 4) rpgtRate = 0.20;
+  else if (years <= 5) rpgtRate = 0.15;
+  else rpgtRate = 0; // after 5 years often 0% for citizen on residential (simplified)
+
+  const rpgt = gain * rpgtRate;
+  const agentFee = sell * (commissionPct / 100);
+  const legalFee = sell * 0.01; // rough
+  const totalCost = rpgt + agentFee + legalFee;
+  const net = sell - outstanding - totalCost;
+
+  document.getElementById("netProceeds").textContent = formatMoney(net);
+  document.getElementById("exitBreakdown").innerHTML = `
+    <tr><td>Selling Price</td><td>${formatMoney(sell)}</td></tr>
+    <tr><td>Less: Outstanding Loan</td><td>${formatMoney(outstanding)}</td></tr>
+    <tr><td>Less: RPGT (est.)</td><td>${formatMoney(rpgt)}</td></tr>
+    <tr><td>Less: Agent Commission (${commissionPct}%)</td><td>${formatMoney(agentFee)}</td></tr>
+    <tr><td>Less: Legal Fee (est.)</td><td>${formatMoney(legalFee)}</td></tr>
+    <tr style="font-weight:700;"><td>Net Cash You Receive</td><td>${formatMoney(net)}</td></tr>`;
+  document.getElementById("exitResult").style.display = "block";
+});
+
+// ====================== RENTAL ======================
 document.getElementById("calcYieldBtn")?.addEventListener("click", function() {
   const price = parseFloat(document.getElementById("rentalPrice").value) || 0;
   const rent = parseFloat(document.getElementById("monthlyRent").value) || 0;
@@ -402,15 +391,79 @@ document.getElementById("calcYieldBtn")?.addEventListener("click", function() {
   document.getElementById("netIncome").textContent = formatMoney(annualNet);
   document.getElementById("netYield").textContent = yieldPct.toFixed(2) + "%";
   document.getElementById("netCashFlow").textContent = formatMoney(netCashFlow);
-
   document.getElementById("yieldResult").style.display = "block";
+});
+
+// ====================== COMPARE ======================
+function renderCompareInputs() {
+  const container = document.getElementById("compareInputs");
+  if (!container) return;
+  container.innerHTML = "";
+  ["A", "B", "C"].forEach(label => {
+    const div = document.createElement("div");
+    div.className = "compare-card";
+    div.innerHTML = `
+      <h3>Unit ${label}</h3>
+      <div class="form-group"><label>Name / Location</label><input type="text" id="cName${label}" placeholder="e.g. Condo KLCC"></div>
+      <div class="form-group"><label>Price (RM)</label><input type="number" id="cPrice${label}" value="${label==='A'?500000:label==='B'?550000:480000}"></div>
+      <div class="form-group"><label>Size (sqft)</label><input type="number" id="cSize${label}" value="1000"></div>
+      <div class="form-group"><label>Reno Estimate (RM)</label><input type="number" id="cReno${label}" value="80000"></div>
+      <div class="form-group"><label>Monthly Rent (RM)</label><input type="number" id="cRent${label}" value="2200"></div>
+      <div class="form-group"><label>Monthly Loan (RM)</label><input type="number" id="cLoan${label}" value="1800"></div>`;
+    container.appendChild(div);
+  });
+}
+
+document.getElementById("calcCompareBtn")?.addEventListener("click", function() {
+  const rows = [
+    ["Name", "cName"],
+    ["Price", "cPrice"],
+    ["Size (sqft)", "cSize"],
+    ["Price per sqft", null],
+    ["Reno Estimate", "cReno"],
+    ["Total Cost (Price+Reno)", null],
+    ["Monthly Rent", "cRent"],
+    ["Monthly Loan", "cLoan"],
+    ["Net Cash Flow", null],
+    ["Gross Yield %", null]
+  ];
+
+  const tbody = document.getElementById("compareBody");
+  tbody.innerHTML = "";
+
+  rows.forEach(([label, prefix]) => {
+    const tr = document.createElement("tr");
+    let cells = `<td><strong>${label}</strong></td>`;
+    ["A","B","C"].forEach(u => {
+      let val = "-";
+      if (prefix) {
+        const el = document.getElementById(prefix + u);
+        val = el ? el.value : "-";
+        if (prefix !== "cName" && val !== "") val = formatMoney(parseFloat(val) || 0);
+      } else {
+        const price = parseFloat(document.getElementById("cPrice"+u).value) || 0;
+        const size = parseFloat(document.getElementById("cSize"+u).value) || 1;
+        const reno = parseFloat(document.getElementById("cReno"+u).value) || 0;
+        const rent = parseFloat(document.getElementById("cRent"+u).value) || 0;
+        const loan = parseFloat(document.getElementById("cLoan"+u).value) || 0;
+        if (label === "Price per sqft") val = formatMoney(price / size);
+        if (label === "Total Cost (Price+Reno)") val = formatMoney(price + reno);
+        if (label === "Net Cash Flow") val = formatMoney(rent - loan);
+        if (label === "Gross Yield %") val = price > 0 ? ((rent * 12 / price) * 100).toFixed(2) + "%" : "-";
+      }
+      cells += `<td>${val}</td>`;
+    });
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  });
+  document.getElementById("compareResult").style.display = "block";
 });
 
 // ====================== INIT ======================
 document.addEventListener("DOMContentLoaded", () => {
   renderCategories();
   renderCommitments();
+  renderCompareInputs();
   document.getElementById("calculateBtn")?.addEventListener("click", calculate);
-  renderMarkers();
-  renderChecklist();
+  calcLoanLive(); // initial loan calculation
 });

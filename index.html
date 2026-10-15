@@ -9,22 +9,21 @@
 </head>
 <body>
   <div class="container">
-    <!-- Menu -->
     <nav class="main-menu">
-      <button class="menu-btn active" data-target="calculator">Calculator</button>
-      <!-- <button class="menu-btn" data-target="checklist">Layout Checklist</button> -->
+      <button class="menu-btn active" data-target="Renovation calculator">Renovation Calculator</button>
       <button class="menu-btn" data-target="loan">Loan & DSR</button>
       <button class="menu-btn" data-target="entry">Entry Cost</button>
+      <button class="menu-btn" data-target="exit">Exit Cost</button>
       <button class="menu-btn" data-target="rental">Rental Yield</button>
+      <button class="menu-btn" data-target="compare">Compare</button>
     </nav>
 
     <!-- ==================== RENOVATION CALCULATOR ==================== -->
-    <div id="calculator" class="section active">
+    <div id="Renovation calculator" class="section active">
       <header>
         <h1>Renovation Cost Calculator</h1>
-        <p class="subtitle">Pre-site visit estimate • Prices in RM</p>
+        <p class="subtitle">Malaysia market estimate • Prices in RM</p>
       </header>
-
       <section class="card">
         <h2>1. Property Details</h2>
         <div class="form-grid">
@@ -66,19 +65,32 @@
               <option value="4">4+ Bathrooms</option>
             </select>
           </div>
+          <div class="form-group">
+            <label>Material Quality</label>
+            <select id="materialQuality">
+              <option value="budget">Budget</option>
+              <option value="mid" selected>Mid-Range</option>
+              <option value="premium">Premium</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Contingency</label>
+            <select id="contingency">
+              <option value="0.10">10%</option>
+              <option value="0.15" selected>15%</option>
+              <option value="0.20">20%</option>
+            </select>
+          </div>
         </div>
       </section>
-
       <section class="card">
         <h2>2. Select Work Scope</h2>
-        <p class="hint">Choose the intensity. Description appears below after selection.</p>
+        <p class="hint">Choose intensity. Description appears after selection.</p>
         <div class="categories" id="categories"></div>
       </section>
-
       <div class="action-bar">
         <button id="calculateBtn" class="btn-primary">Calculate Estimate (RM)</button>
       </div>
-
       <section class="card result-card" id="resultSection" style="display:none;">
         <h2>Your Estimated Renovation Cost</h2>
         <div class="total-range">
@@ -87,83 +99,29 @@
             <span class="amount" id="totalRange">RM 0 – RM 0</span>
           </div>
           <p class="area-info" id="areaInfo"></p>
+          <p class="area-info" id="psfInfo" style="margin-top:6px;"></p>
         </div>
         <div class="breakdown">
           <h3>Cost Breakdown</h3>
           <table>
             <thead>
-              <tr>
-                <th>Category</th>
-                <th>Intensity</th>
-                <th>Estimated Cost (RM)</th>
-              </tr>
+              <tr><th>Category</th><th>Intensity</th><th>Estimated Cost (RM)</th></tr>
             </thead>
             <tbody id="breakdownBody"></tbody>
           </table>
         </div>
         <div class="disclaimer">
-          <strong>Disclaimer:</strong> Pre-site visit estimate only. Actual quotation may vary by ±15–30% based on material selection and site conditions.
+          <strong>Disclaimer:</strong> Pre-site visit estimate based on typical Malaysia market rates (Klang Valley). 
+          Actual quotation may vary ±15–30%.
         </div>
       </section>
     </div>
 
-    <!-- ==================== LAYOUT CHECKLIST ==================== -->
-    <div id="checklist" class="section">
-      <header>
-        <h1>Layout Checklist</h1>
-        <p class="subtitle">Upload floor plan → mark areas → track progress (auto-saved)</p>
-      </header>
-
-      <section class="card">
-        <h2>1. Upload Floor Plan</h2>
-        <input type="file" id="planUpload" accept="image/*">
-        <p class="hint" style="margin-top:10px;">Click on the plan to place a marker</p>
-      </section>
-
-      <section class="card">
-        <div class="plan-wrapper">
-          <div id="planContainer">
-            <img id="planImage" src="" alt="Floor Plan" style="display:none;">
-            <div id="markers"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>2. Add Checklist Item</h2>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Area</label>
-            <select id="itemArea">
-              <option value="Living">Living</option>
-              <option value="Kitchen">Kitchen</option>
-              <option value="Bedroom">Bedroom</option>
-              <option value="Bathroom">Bathroom</option>
-              <option value="Dining">Dining</option>
-              <option value="Others">Others</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Item Name</label>
-            <input type="text" id="itemName" placeholder="e.g. TV Cabinet">
-          </div>
-        </div>
-        <button id="addItemBtn" class="btn-primary" style="margin-top:16px;">Add Item + Place Marker</button>
-      </section>
-
-      <section class="card">
-        <h2>3. Checklist</h2>
-        <div id="checklistItems">
-          <p class="hint">No items yet.</p>
-        </div>
-      </section>
-    </div>
-
-    <!-- ==================== LOAN & DSR ==================== -->
+    <!-- ==================== LOAN & DSR (Interactive) ==================== -->
     <div id="loan" class="section">
       <header>
-        <h1>Loan & Affordability Calculator</h1>
-        <p class="subtitle">Monthly payment + DSR + how much you can afford</p>
+        <h1>Loan & DSR Simulator</h1>
+        <p class="subtitle">Change the numbers live in front of customer</p>
       </header>
 
       <section class="card">
@@ -178,18 +136,21 @@
             <input type="number" id="otherIncome" value="0" step="100">
           </div>
         </div>
-
         <h3 style="margin:18px 0 10px;font-size:1rem;">Monthly Commitments</h3>
         <div id="commitmentsList"></div>
         <button type="button" id="addCommitBtn" class="btn-secondary" style="margin-top:12px;">+ Add Commitment</button>
       </section>
 
       <section class="card">
-        <h2>2. Loan Details</h2>
+        <h2>2. Loan Simulation (Live)</h2>
         <div class="form-grid">
           <div class="form-group">
+            <label>Property Price (RM)</label>
+            <input type="number" id="simPropertyPrice" value="500000" step="10000">
+          </div>
+          <div class="form-group">
             <label>Loan Amount (RM)</label>
-            <input type="number" id="loanAmount" value="400000" step="10000">
+            <input type="number" id="loanAmount" value="450000" step="10000">
           </div>
           <div class="form-group">
             <label>Interest Rate (% p.a.)</label>
@@ -200,65 +161,81 @@
             <input type="number" id="loanYears" value="30" min="1" max="35">
           </div>
         </div>
-        <button id="calcLoanBtn" class="btn-primary" style="margin-top:20px;">Calculate Loan & DSR</button>
+        <p class="hint" style="margin-top:12px;">Change any number above — result updates automatically</p>
       </section>
 
-      <section class="card result-card" id="loanResult" style="display:none;">
-        <h2>Results</h2>
+      <section class="card result-card" id="loanResult">
+  <h2>Live Result</h2>
 
-        <div class="total-range">
-          <div class="range-box">
-            <span class="label">Monthly Loan Payment</span>
-            <span class="amount" id="monthlyPayment">RM 0</span>
-          </div>
-        </div>
+  <!-- Overall Advice -->
+  <div id="overallAdvice" class="overall-advice">
+    <div class="advice-title" id="adviceTitle">Calculating...</div>
+    <div class="advice-desc" id="adviceDesc"></div>
+  </div>
 
-        <div class="breakdown">
-          <p><strong>Total Payment:</strong> <span id="totalPayment">RM 0</span></p>
-          <p><strong>Total Interest:</strong> <span id="totalInterest">RM 0</span></p>
-        </div>
+  <div class="total-range">
+    <div class="range-box">
+      <span class="label">Monthly Loan Payment</span>
+      <span class="amount" id="monthlyPayment">RM 0</span>
+    </div>
+  </div>
 
-        <h3 style="margin:20px 0 12px;">Debt Service Ratio (DSR)</h3>
-        <div class="dsr-box" id="dsrBox">
-          <div class="dsr-value" id="dsrValue">0%</div>
-          <div class="dsr-status" id="dsrStatus">-</div>
-        </div>
+  <div class="breakdown">
+    <p><strong>Total Payment:</strong> <span id="totalPayment">RM 0</span></p>
+    <p><strong>Total Interest:</strong> <span id="totalInterest">RM 0</span></p>
+  </div>
 
-        <h3 style="margin:24px 0 12px;">Affordability Guide (based on your income)</h3>
-        <div class="afford-grid">
-          <div class="afford-box">
-            <div class="label">Capability to Buy House<br>(Salary × 60)</div>
-            <div class="value" id="maxHousePrice">RM 0</div>
-          </div>
-          <div class="afford-box">
-            <div class="label">House Loan Limit<br>(Salary × 0.30)</div>
-            <div class="value" id="loanLimit">RM 0</div>
-          </div>
-          <div class="afford-box">
-            <div class="label">Total Limit You Can Afford<br>(Salary × 0.35)</div>
-            <div class="value" id="totalLimit">RM 0</div>
-          </div>
-          <div class="afford-box">
-            <div class="label">Cash to Prepare<br>(≈ 30% of Loan/House)</div>
-            <div class="value" id="cashNeeded">RM 0</div>
-          </div>
-        </div>
+  <!-- DSR with progress bar -->
+  <h3 style="margin:20px 0 12px;">Debt Service Ratio (DSR)</h3>
+  <div class="dsr-container">
+    <div class="dsr-value-big" id="dsrValue">0%</div>
+    <div class="dsr-bar-bg">
+      <div class="dsr-bar-fill" id="dsrBar"></div>
+      <div class="dsr-markers">
+        <span style="left:60%">60%</span>
+        <span style="left:70%">70%</span>
+      </div>
+    </div>
+    <div class="dsr-status" id="dsrStatus">-</div>
+  </div>
 
-        <div class="disclaimer" style="margin-top:20px;">
-          <strong>Important Notice:</strong> DSR thresholds and affordability figures are general guides only. 
-          Each bank has its own internal policy. Actual approval depends on credit score, employment type, and bank assessment. 
-          This tool does not guarantee loan approval.
-        </div>
-      </section>
+  <h3 style="margin:28px 0 12px;">Affordability Guide</h3>
+  <div class="afford-grid">
+    <div class="afford-box" id="boxCapability">
+      <div class="label">Capability to Buy House</div>
+      <div class="value" id="maxHousePrice">RM 0</div>
+      <div class="explain" id="explainCapability">Maximum comfortable house price (Salary × 60)</div>
+    </div>
+    <div class="afford-box" id="boxLoanLimit">
+      <div class="label">Loan Limit (Monthly)</div>
+      <div class="value" id="loanLimit">RM 0</div>
+      <div class="explain" id="explainLoanLimit">Comfortable monthly instalment (Salary × 0.30)</div>
+    </div>
+    <div class="afford-box" id="boxTotalLimit">
+      <div class="label">Total Debt Limit</div>
+      <div class="value" id="totalLimit">RM 0</div>
+      <div class="explain" id="explainTotalLimit">Max total monthly debts (Salary × 0.35)</div>
+    </div>
+    <div class="afford-box" id="boxCash">
+      <div class="label">Cash to Prepare</div>
+      <div class="value" id="cashNeeded">RM 0</div>
+      <div class="explain">Estimated upfront cash needed (~30% of loan)</div>
+    </div>
+  </div>
+
+  <div class="disclaimer" style="margin-top:20px;">
+    <strong>Notice:</strong> These are general guides only. Final approval depends on the bank’s policy, credit score and employment type.
+  </div>
+</section>
+
     </div>
 
     <!-- ==================== ENTRY COST ==================== -->
     <div id="entry" class="section">
       <header>
         <h1>Entry Cost / Upfront Cash</h1>
-        <p class="subtitle">Estimate how much cash you need before getting the keys</p>
+        <p class="subtitle">Cash needed before getting the keys</p>
       </header>
-
       <section class="card">
         <div class="form-grid">
           <div class="form-group">
@@ -276,7 +253,6 @@
         </div>
         <button id="calcEntryBtn" class="btn-primary" style="margin-top:20px;">Calculate Upfront Cost</button>
       </section>
-
       <section class="card result-card" id="entryResult" style="display:none;">
         <h2>Estimated Upfront Cash Needed</h2>
         <div class="total-range">
@@ -285,14 +261,60 @@
             <span class="amount" id="totalCash">RM 0</span>
           </div>
         </div>
-
-        <table style="margin-top:20px;">
-          <tbody id="entryBreakdown"></tbody>
-        </table>
-
+        <table style="margin-top:20px;"><tbody id="entryBreakdown"></tbody></table>
         <div class="disclaimer" style="margin-top:20px;">
-          Stamp duty uses current Malaysian citizen/PR rates. Legal fees are estimates only (actual may vary by lawyer). 
-          First-time buyer exemptions may apply for properties ≤ RM500,000.
+          Stamp duty uses Malaysian citizen/PR rates. Legal fees are estimates.
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================== EXIT COST ==================== -->
+    <div id="exit" class="section">
+      <header>
+        <h1>Exit / Selling Cost</h1>
+        <p class="subtitle">Estimate cost when selling the property later</p>
+      </header>
+      <section class="card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Expected Selling Price (RM)</label>
+            <input type="number" id="exitPrice" value="600000" step="10000">
+          </div>
+          <div class="form-group">
+            <label>Original Purchase Price (RM)</label>
+            <input type="number" id="exitPurchase" value="500000" step="10000">
+          </div>
+          <div class="form-group">
+            <label>Outstanding Loan (RM)</label>
+            <input type="number" id="exitLoan" value="400000" step="10000">
+          </div>
+          <div class="form-group">
+            <label>Holding Period</label>
+            <select id="exitYears">
+              <option value="3">Within 3 years</option>
+              <option value="4">3 – 4 years</option>
+              <option value="5">4 – 5 years</option>
+              <option value="6" selected>More than 5 years</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Agent Commission (%)</label>
+            <input type="number" id="exitCommission" value="2.5" step="0.5" min="0" max="5">
+          </div>
+        </div>
+        <button id="calcExitBtn" class="btn-primary" style="margin-top:20px;">Calculate Exit Cost</button>
+      </section>
+      <section class="card result-card" id="exitResult" style="display:none;">
+        <h2>Estimated Exit Cost & Net Proceeds</h2>
+        <div class="total-range">
+          <div class="range-box">
+            <span class="label">Net Cash You Receive</span>
+            <span class="amount" id="netProceeds">RM 0</span>
+          </div>
+        </div>
+        <table style="margin-top:20px;"><tbody id="exitBreakdown"></tbody></table>
+        <div class="disclaimer" style="margin-top:20px;">
+          RPGT rates are simplified for Malaysian citizens. Actual rate depends on exact holding period and current LHDN rules.
         </div>
       </section>
     </div>
@@ -301,9 +323,8 @@
     <div id="rental" class="section">
       <header>
         <h1>Rental Yield Calculator</h1>
-        <p class="subtitle">Net yield after all major expenses</p>
+        <p class="subtitle">Net yield after major expenses</p>
       </header>
-
       <section class="card">
         <div class="form-grid">
           <div class="form-group">
@@ -335,13 +356,12 @@
             <input type="number" id="insurance" value="400" step="50">
           </div>
           <div class="form-group">
-            <label>Monthly Loan Installment (RM) <small>(optional)</small></label>
+            <label>Monthly Loan Installment (RM)</label>
             <input type="number" id="rentalLoan" value="0" step="50">
           </div>
         </div>
         <button id="calcYieldBtn" class="btn-primary" style="margin-top:20px;">Calculate Yield</button>
       </section>
-
       <section class="card result-card" id="yieldResult" style="display:none;">
         <h2>Rental Yield Result</h2>
         <div class="total-range">
@@ -350,21 +370,48 @@
             <span class="amount" id="netYield">0%</span>
           </div>
         </div>
-
         <div class="breakdown">
           <p><strong>Annual Gross Rent:</strong> <span id="grossRent">RM 0</span></p>
           <p><strong>Annual Total Expenses:</strong> <span id="annualExpenses">RM 0</span></p>
           <p><strong>Annual Net Income:</strong> <span id="netIncome">RM 0</span></p>
           <p style="margin-top:12px;"><strong>Net Monthly Cash Flow:</strong> <span id="netCashFlow">RM 0</span></p>
         </div>
-
         <div class="disclaimer" style="margin-top:16px;">
           Good net yield for condos in Malaysia is generally 3.5% – 5% after expenses.
         </div>
       </section>
     </div>
-  </div>
 
+    <!-- ==================== COMPARE ==================== -->
+    <div id="compare" class="section">
+      <header>
+        <h1>Property Comparison</h1>
+        <p class="subtitle">Key in 2–3 units and compare side by side</p>
+      </header>
+      <section class="card">
+        <div class="compare-grid" id="compareInputs">
+          <!-- generated by JS -->
+        </div>
+        <button id="calcCompareBtn" class="btn-primary" style="margin-top:20px;">Compare Now</button>
+      </section>
+      <section class="card result-card" id="compareResult" style="display:none;">
+        <h2>Comparison Result</h2>
+        <div style="overflow-x:auto;">
+          <table id="compareTable">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Unit A</th>
+                <th>Unit B</th>
+                <th>Unit C</th>
+              </tr>
+            </thead>
+            <tbody id="compareBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
