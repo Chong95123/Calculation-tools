@@ -10,13 +10,13 @@
 <body>
   <div class="container">
     <nav class="main-menu">
-      <button class="menu-btn active" data-target="Renovation calculator">Renovation Calculator</button>
-      <button class="menu-btn" data-target="loan">Loan & DSR</button>
-      <button class="menu-btn" data-target="entry">Entry Cost</button>
-      <button class="menu-btn" data-target="exit">Exit Cost</button>
-      <button class="menu-btn" data-target="rental">Rental Yield</button>
-      <button class="menu-btn" data-target="compare">Compare</button>
-    </nav>
+  <button class="menu-btn active" data-target="Renovation calculator">Renovation Calculator</button>
+  <button class="menu-btn" data-target="loan">Loan & DSR</button>
+  <button class="menu-btn" data-target="entryexit">Entry + Exit</button>
+  <button class="menu-btn" data-target="rental">Rental Yield</button>
+  <button class="menu-btn" data-target="compare">Compare</button>
+  <button class="menu-btn" data-target="report">Full Report</button>
+</nav>
 
     <!-- ==================== RENOVATION CALCULATOR ==================== -->
     <div id="Renovation calculator" class="section active">
@@ -118,207 +118,216 @@
     </div>
 
     <!-- ==================== LOAN & DSR (Interactive) ==================== -->
-    <div id="loan" class="section">
-      <header>
-        <h1>Loan & DSR Simulator</h1>
-        <p class="subtitle">Change the numbers live in front of customer</p>
-      </header>
+<div id="loan" class="section">
+  <header>
+    <h1>Loan & DSR Simulator</h1>
+    <p class="subtitle">Change the numbers live in front of customer</p>
+  </header>
 
-      <section class="card">
-        <h2>1. Income & Commitments</h2>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Monthly Salary (RM)</label>
-            <input type="number" id="monthlySalary" value="6000" step="100">
-          </div>
-          <div class="form-group">
-            <label>Other Monthly Income (RM)</label>
-            <input type="number" id="otherIncome" value="0" step="100">
-          </div>
-        </div>
-        <h3 style="margin:18px 0 10px;font-size:1rem;">Monthly Commitments</h3>
-        <div id="commitmentsList"></div>
-        <button type="button" id="addCommitBtn" class="btn-secondary" style="margin-top:12px;">+ Add Commitment</button>
-      </section>
-
-      <section class="card">
-        <h2>2. Loan Simulation (Live)</h2>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Property Price (RM)</label>
-            <input type="number" id="simPropertyPrice" value="500000" step="10000">
-          </div>
-          <div class="form-group">
-            <label>Loan Amount (RM)</label>
-            <input type="number" id="loanAmount" value="450000" step="10000">
-          </div>
-          <div class="form-group">
-            <label>Interest Rate (% p.a.)</label>
-            <input type="number" id="interestRate" value="4.2" step="0.1">
-          </div>
-          <div class="form-group">
-            <label>Loan Tenure (Years)</label>
-            <input type="number" id="loanYears" value="30" min="1" max="35">
-          </div>
-        </div>
-        <p class="hint" style="margin-top:12px;">Change any number above — result updates automatically</p>
-      </section>
-
-      <section class="card result-card" id="loanResult">
-  <h2>Live Result</h2>
-
-  <!-- Overall Advice -->
-  <div id="overallAdvice" class="overall-advice">
-    <div class="advice-title" id="adviceTitle">Calculating...</div>
-    <div class="advice-desc" id="adviceDesc"></div>
-  </div>
-
-  <div class="total-range">
-    <div class="range-box">
-      <span class="label">Monthly Loan Payment</span>
-      <span class="amount" id="monthlyPayment">RM 0</span>
-    </div>
-  </div>
-
-  <div class="breakdown">
-    <p><strong>Total Payment:</strong> <span id="totalPayment">RM 0</span></p>
-    <p><strong>Total Interest:</strong> <span id="totalInterest">RM 0</span></p>
-  </div>
-
-  <!-- DSR with progress bar -->
-  <h3 style="margin:20px 0 12px;">Debt Service Ratio (DSR)</h3>
-  <div class="dsr-container">
-    <div class="dsr-value-big" id="dsrValue">0%</div>
-    <div class="dsr-bar-bg">
-      <div class="dsr-bar-fill" id="dsrBar"></div>
-      <div class="dsr-markers">
-        <span style="left:60%">60%</span>
-        <span style="left:70%">70%</span>
+  <section class="card">
+    <h2>1. Income & Commitments</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Monthly Salary (RM)</label>
+        <input type="number" id="monthlySalary" value="6000" step="100">
+      </div>
+      <div class="form-group">
+        <label>Other Monthly Income (RM)</label>
+        <input type="number" id="otherIncome" value="0" step="100">
       </div>
     </div>
-    <div class="dsr-status" id="dsrStatus">-</div>
-  </div>
+    <h3 style="margin:18px 0 10px;font-size:1rem;">Monthly Commitments</h3>
+    <div id="commitmentsList"></div>
+    <button type="button" id="addCommitBtn" class="btn-secondary" style="margin-top:12px;">+ Add Commitment</button>
+  </section>
 
-  <h3 style="margin:28px 0 12px;">Affordability Guide</h3>
-  <div class="afford-grid">
-    <div class="afford-box" id="boxCapability">
-      <div class="label">Capability to Buy House</div>
-      <div class="value" id="maxHousePrice">RM 0</div>
-      <div class="explain" id="explainCapability">Maximum comfortable house price (Salary × 60)</div>
+  <section class="card">
+    <h2>2. Loan Simulation (Live)</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Property Price (RM)</label>
+        <input type="number" id="simPropertyPrice" value="500000" step="10000">
+      </div>
+      <div class="form-group">
+        <label>LTV / Margin of Finance</label>
+        <select id="ltvSelect">
+          <option value="0.90" selected>Residential (1st & 2nd) - 90%</option>
+          <option value="0.70">Residential (3rd+) - 70%</option>
+          <option value="0.70">Commercial - 70%</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Loan Amount (RM)</label>
+        <input type="number" id="loanAmount" value="450000" step="10000">
+      </div>
+      <div class="form-group">
+        <label>Interest Rate (% p.a.)</label>
+        <input type="number" id="interestRate" value="4.2" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>Loan Tenure (Years)</label>
+        <input type="number" id="loanYears" value="30" min="1" max="35">
+      </div>
     </div>
-    <div class="afford-box" id="boxLoanLimit">
-      <div class="label">Loan Limit (Monthly)</div>
-      <div class="value" id="loanLimit">RM 0</div>
-      <div class="explain" id="explainLoanLimit">Comfortable monthly instalment (Salary × 0.30)</div>
-    </div>
-    <div class="afford-box" id="boxTotalLimit">
-      <div class="label">Total Debt Limit</div>
-      <div class="value" id="totalLimit">RM 0</div>
-      <div class="explain" id="explainTotalLimit">Max total monthly debts (Salary × 0.35)</div>
-    </div>
-    <div class="afford-box" id="boxCash">
-      <div class="label">Cash to Prepare</div>
-      <div class="value" id="cashNeeded">RM 0</div>
-      <div class="explain">Estimated upfront cash needed (~30% of loan)</div>
-    </div>
-  </div>
+    <p class="hint" style="margin-top:12px;">Change any number above — result updates automatically</p>
+  </section>
 
-  <div class="disclaimer" style="margin-top:20px;">
-    <strong>Notice:</strong> These are general guides only. Final approval depends on the bank’s policy, credit score and employment type.
-  </div>
-</section>
+  <section class="card result-card" id="loanResult">
+    <h2>Live Result</h2>
 
-    </div>
-
-    <!-- ==================== ENTRY COST ==================== -->
-    <div id="entry" class="section">
-      <header>
-        <h1>Entry Cost / Upfront Cash</h1>
-        <p class="subtitle">Cash needed before getting the keys</p>
-      </header>
-      <section class="card">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Property Price (RM)</label>
-            <input type="number" id="entryPrice" value="500000" step="10000">
-          </div>
-          <div class="form-group">
-            <label>Down Payment (%)</label>
-            <input type="number" id="downPercent" value="10" min="10" max="30" step="5">
-          </div>
-          <div class="form-group">
-            <label>Loan Amount (RM)</label>
-            <input type="number" id="entryLoan" value="450000" step="10000">
-          </div>
-        </div>
-        <button id="calcEntryBtn" class="btn-primary" style="margin-top:20px;">Calculate Upfront Cost</button>
-      </section>
-      <section class="card result-card" id="entryResult" style="display:none;">
-        <h2>Estimated Upfront Cash Needed</h2>
-        <div class="total-range">
-          <div class="range-box">
-            <span class="label">Total Cash Required</span>
-            <span class="amount" id="totalCash">RM 0</span>
-          </div>
-        </div>
-        <table style="margin-top:20px;"><tbody id="entryBreakdown"></tbody></table>
-        <div class="disclaimer" style="margin-top:20px;">
-          Stamp duty uses Malaysian citizen/PR rates. Legal fees are estimates.
-        </div>
-      </section>
+    <!-- Overall Advice -->
+    <div id="overallAdvice" class="overall-advice">
+      <div class="advice-title" id="adviceTitle">Calculating...</div>
+      <div class="advice-desc" id="adviceDesc"></div>
     </div>
 
-    <!-- ==================== EXIT COST ==================== -->
-    <div id="exit" class="section">
-      <header>
-        <h1>Exit / Selling Cost</h1>
-        <p class="subtitle">Estimate cost when selling the property later</p>
-      </header>
-      <section class="card">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Expected Selling Price (RM)</label>
-            <input type="number" id="exitPrice" value="600000" step="10000">
-          </div>
-          <div class="form-group">
-            <label>Original Purchase Price (RM)</label>
-            <input type="number" id="exitPurchase" value="500000" step="10000">
-          </div>
-          <div class="form-group">
-            <label>Outstanding Loan (RM)</label>
-            <input type="number" id="exitLoan" value="400000" step="10000">
-          </div>
-          <div class="form-group">
-            <label>Holding Period</label>
-            <select id="exitYears">
-              <option value="3">Within 3 years</option>
-              <option value="4">3 – 4 years</option>
-              <option value="5">4 – 5 years</option>
-              <option value="6" selected>More than 5 years</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Agent Commission (%)</label>
-            <input type="number" id="exitCommission" value="2.5" step="0.5" min="0" max="5">
-          </div>
-        </div>
-        <button id="calcExitBtn" class="btn-primary" style="margin-top:20px;">Calculate Exit Cost</button>
-      </section>
-      <section class="card result-card" id="exitResult" style="display:none;">
-        <h2>Estimated Exit Cost & Net Proceeds</h2>
-        <div class="total-range">
-          <div class="range-box">
-            <span class="label">Net Cash You Receive</span>
-            <span class="amount" id="netProceeds">RM 0</span>
-          </div>
-        </div>
-        <table style="margin-top:20px;"><tbody id="exitBreakdown"></tbody></table>
-        <div class="disclaimer" style="margin-top:20px;">
-          RPGT rates are simplified for Malaysian citizens. Actual rate depends on exact holding period and current LHDN rules.
-        </div>
-      </section>
+    <div class="total-range">
+      <div class="range-box">
+        <span class="label">Monthly Loan Payment</span>
+        <span class="amount" id="monthlyPayment">RM 0</span>
+      </div>
     </div>
 
+    <div class="breakdown">
+      <p><strong>Total Payment:</strong> <span id="totalPayment">RM 0</span></p>
+      <p><strong>Total Interest:</strong> <span id="totalInterest">RM 0</span></p>
+    </div>
+
+    <!-- DSR with progress bar -->
+    <h3 style="margin:20px 0 12px;">Debt Service Ratio (DSR)</h3>
+    <div class="dsr-container">
+      <div class="dsr-value-big" id="dsrValue">0%</div>
+      <div class="dsr-bar-bg">
+        <div class="dsr-bar-fill" id="dsrBar"></div>
+        <div class="dsr-markers">
+          <span style="left:60%">60%</span>
+          <span style="left:70%">70%</span>
+        </div>
+      </div>
+      <div class="dsr-status" id="dsrStatus">-</div>
+    </div>
+
+    <h3 style="margin:28px 0 12px;">Affordability Guide (Bank Practice)</h3>
+    <div class="afford-grid">
+      <div class="afford-box" id="boxCapability">
+        <div class="label">Capability to Buy House</div>
+        <div class="value" id="maxHousePrice">RM 0</div>
+        <div class="explain" id="explainCapability">Maximum comfortable house price (Salary × 85)</div>
+      </div>
+      <div class="afford-box" id="boxLoanLimit">
+        <div class="label">Loan Limit (Monthly)</div>
+        <div class="value" id="loanLimit">RM 0</div>
+        <div class="explain" id="explainLoanLimit">Comfortable monthly instalment (Salary × 0.40)</div>
+      </div>
+      <div class="afford-box" id="boxTotalLimit">
+        <div class="label">Total Debt Limit</div>
+        <div class="value" id="totalLimit">RM 0</div>
+        <div class="explain" id="explainTotalLimit">Max total monthly debts (Salary × 0.65)</div>
+      </div>
+      <div class="afford-box" id="boxCash">
+        <div class="label">Cash to Prepare</div>
+        <div class="value" id="cashNeeded">RM 0</div>
+        <div class="explain" id="explainCash">Based on LTV + estimated fees</div>
+      </div>
+    </div>
+
+    <div class="disclaimer" style="margin-top:20px;">
+      <strong>Notice:</strong> These figures follow common Malaysian bank practice (2026). Final approval still depends on credit score, employment type and each bank’s internal policy.
+    </div>
+  </section>
+</div>
+
+
+
+    <!-- ==================== ENTRY + EXIT COST ==================== -->
+<div id="entryexit" class="section">
+  <header>
+    <h1>Entry + Exit Cost</h1>
+    <p class="subtitle">Cash needed when buying and when selling later</p>
+  </header>
+
+  <!-- ENTRY COST -->
+  <section class="card">
+    <h2>1. Entry Cost (When Buying)</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Property Price (RM)</label>
+        <input type="number" id="entryPrice" value="500000" step="10000">
+      </div>
+      <div class="form-group">
+        <label>LTV / Margin of Finance</label>
+        <select id="entryLtv">
+          <option value="0.90" selected>Residential (1st & 2nd) - 90%</option>
+          <option value="0.70">Residential (3rd+) - 70%</option>
+          <option value="0.70">Commercial - 70%</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Loan Amount (RM)</label>
+        <input type="number" id="entryLoan" value="450000" step="10000">
+      </div>
+    </div>
+    <button id="calcEntryBtn" class="btn-primary" style="margin-top:16px;">Calculate Entry Cost</button>
+  </section>
+
+  <section class="card result-card" id="entryResult" style="display:none;">
+    <h2>Estimated Upfront Cash Needed</h2>
+    <div class="total-range">
+      <div class="range-box">
+        <span class="label">Total Cash Required</span>
+        <span class="amount" id="totalCash">RM 0</span>
+      </div>
+    </div>
+    <table style="margin-top:16px;"><tbody id="entryBreakdown"></tbody></table>
+  </section>
+
+  <!-- EXIT COST -->
+  <section class="card" style="margin-top:24px;">
+    <h2>2. Exit Cost (When Selling)</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Expected Selling Price (RM)</label>
+        <input type="number" id="exitPrice" value="600000" step="10000">
+      </div>
+      <div class="form-group">
+        <label>Original Purchase Price (RM)</label>
+        <input type="number" id="exitPurchase" value="500000" step="10000">
+      </div>
+      <div class="form-group">
+        <label>Outstanding Loan (RM)</label>
+        <input type="number" id="exitLoan" value="400000" step="10000">
+      </div>
+      <div class="form-group">
+        <label>Holding Period</label>
+        <select id="exitYears">
+          <option value="3">Within 3 years</option>
+          <option value="4">3 – 4 years</option>
+          <option value="5">4 – 5 years</option>
+          <option value="6" selected>More than 5 years</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Agent Commission (%)</label>
+        <input type="number" id="exitCommission" value="2.5" step="0.5" min="0" max="5">
+      </div>
+    </div>
+    <button id="calcExitBtn" class="btn-primary" style="margin-top:16px;">Calculate Exit Cost</button>
+  </section>
+
+  <section class="card result-card" id="exitResult" style="display:none;">
+    <h2>Estimated Exit Cost & Net Proceeds</h2>
+    <div class="total-range">
+      <div class="range-box">
+        <span class="label">Net Cash You Receive</span>
+        <span class="amount" id="netProceeds">RM 0</span>
+      </div>
+    </div>
+    <table style="margin-top:16px;"><tbody id="exitBreakdown"></tbody></table>
+    <div class="disclaimer" style="margin-top:16px;">
+      RPGT rates are simplified for Malaysian citizens. Actual rate depends on exact holding period and current LHDN rules.
+    </div>
+  </section>
+</div>
     <!-- ==================== RENTAL YIELD ==================== -->
     <div id="rental" class="section">
       <header>
@@ -411,6 +420,46 @@
         </div>
       </section>
     </div>
+
+    <!-- ==================== FULL REPORT ==================== -->
+<div id="report" class="section">
+  <header>
+    <h1>Full Property Report</h1>
+    <p class="subtitle">Summary of all calculations for customer discussion</p>
+  </header>
+
+  <section class="card">
+    <h2>Property Summary</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Customer / Property Name</label>
+        <input type="text" id="reportName" placeholder="e.g. Mr. Tan - Condo KLCC">
+      </div>
+      <div class="form-group">
+        <label>Property Price (RM)</label>
+        <input type="number" id="reportPrice" value="500000">
+      </div>
+      <div class="form-group">
+        <label>Size (sqft)</label>
+        <input type="number" id="reportSize" value="1000">
+      </div>
+    </div>
+    <button id="generateReportBtn" class="btn-primary" style="margin-top:16px;">Generate Full Report</button>
+  </section>
+
+  <section class="card result-card" id="fullReportResult" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h2 style="margin:0;">Full Report</h2>
+      <button onclick="window.print()" class="btn-secondary">Print / Save as PDF</button>
+    </div>
+
+    <div id="reportContent">
+      <!-- Content will be generated by JS -->
+    </div>
+  </section>
+</div>
+
+
   </div>
   <script src="script.js"></script>
 </body>

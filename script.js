@@ -172,7 +172,13 @@ function calcLoanLive() {
   const totalCommit = commitments.reduce((s, c) => s + (c.amount || 0), 0);
 
   const propertyPrice = parseFloat(document.getElementById("simPropertyPrice").value) || 0;
-  const P = parseFloat(document.getElementById("loanAmount").value) || 0;
+  const ltv = parseFloat(document.getElementById("ltvSelect").value) || 0.90;
+  let P = parseFloat(document.getElementById("loanAmount").value) || 0;
+
+  // Auto-suggest loan amount based on LTV (optional helper)
+  const maxLoanByLtv = propertyPrice * ltv;
+  // Keep the manually entered loan amount, but we use it for calculation
+
   const annualRate = parseFloat(document.getElementById("interestRate").value) / 100 || 0;
   const years = parseFloat(document.getElementById("loanYears").value) || 30;
   const r = annualRate / 12;
@@ -195,11 +201,11 @@ function calcLoanLive() {
   document.getElementById("totalInterest").textContent = formatMoney(totalInterest);
 
   // ===== DSR Bar & Colour =====
-  const dsrValue = document.getElementById("dsrValue");
+  const dsrValueEl = document.getElementById("dsrValue");
   const dsrBar = document.getElementById("dsrBar");
   const dsrStatus = document.getElementById("dsrStatus");
 
-  dsrValue.textContent = dsr.toFixed(1) + "%";
+  dsrValueEl.textContent = dsr.toFixed(1) + "%";
   const barWidth = Math.min(dsr, 100);
   dsrBar.style.width = barWidth + "%";
 
@@ -217,11 +223,15 @@ function calcLoanLive() {
     dsrStatus.style.color = "#991b1b";
   }
 
-  // ===== Affordability numbers =====
-  const capability = totalIncome * 60;
-  const loanLimit = totalIncome * 0.30;
-  const totalLimit = totalIncome * 0.35;
-  const cashNeeded = P * 0.30;
+  // ===== NEW Realistic Formulas =====
+  const capability = totalIncome * 85;          // Salary × 85
+  const loanLimit = totalIncome * 0.40;         // Salary × 0.40
+  const totalLimit = totalIncome * 0.65;        // Salary × 0.65
+
+  // Cash to Prepare based on LTV + ~6% fees
+  const downPayment = propertyPrice * (1 - ltv);
+  const estimatedFees = propertyPrice * 0.06;
+  const cashNeeded = downPayment + estimatedFees;
 
   document.getElementById("maxHousePrice").textContent = formatMoney(capability);
   document.getElementById("loanLimit").textContent = formatMoney(loanLimit);
@@ -234,16 +244,16 @@ function calcLoanLive() {
   const boxTotal = document.getElementById("boxTotalLimit");
   const boxCash = document.getElementById("boxCash");
 
-  // Reset
   [boxCap, boxLoan, boxTotal, boxCash].forEach(b => {
     b.classList.remove("good", "caution", "bad");
   });
 
+
   // 1. Capability vs Property Price
   if (propertyPrice <= capability) {
     boxCap.classList.add("good");
-    document.getElementById("explainCapability").textContent = "Property price is within comfortable range";
-  } else if (propertyPrice <= capability * 1.25) {
+    document.getElementById("explainCapability").textContent = "Property price is within comfortable range (Salary × 85)";
+  } else if (propertyPrice <= capability * 1.15) {
     boxCap.classList.add("caution");
     document.getElementById("explainCapability").textContent = "Property price is slightly above comfortable limit";
   } else {
@@ -254,8 +264,8 @@ function calcLoanLive() {
   // 2. Loan Limit vs Monthly Payment
   if (monthly <= loanLimit) {
     boxLoan.classList.add("good");
-    document.getElementById("explainLoanLimit").textContent = "Monthly payment is within comfortable limit";
-  } else if (monthly <= loanLimit * 1.2) {
+    document.getElementById("explainLoanLimit").textContent = "Monthly payment is within comfortable limit (Salary × 0.40)";
+  } else if (monthly <= loanLimit * 1.15) {
     boxLoan.classList.add("caution");
     document.getElementById("explainLoanLimit").textContent = "Monthly payment is slightly high";
   } else {
@@ -267,17 +277,18 @@ function calcLoanLive() {
   const totalDebt = monthly + totalCommit;
   if (totalDebt <= totalLimit) {
     boxTotal.classList.add("good");
-    document.getElementById("explainTotalLimit").textContent = "Total debts are within safe limit";
-  } else if (totalDebt <= totalLimit * 1.2) {
+    document.getElementById("explainTotalLimit").textContent = "Total debts are within bank DSR range (Salary × 0.65)";
+  } else if (totalDebt <= totalLimit * 1.1) {
     boxTotal.classList.add("caution");
-    document.getElementById("explainTotalLimit").textContent = "Total debts are slightly high";
+    document.getElementById("explainTotalLimit").textContent = "Total debts are approaching the upper limit";
   } else {
     boxTotal.classList.add("bad");
-    document.getElementById("explainTotalLimit").textContent = "Total debts exceed recommended limit";
+    document.getElementById("explainTotalLimit").textContent = "Total debts exceed typical bank DSR limit";
   }
 
-  // 4. Cash box - neutral
+  // 4. Cash box - always neutral / info
   boxCash.classList.add("good");
+  document.getElementById("explainCash").textContent = `Down payment (${((1-ltv)*100).toFixed(0)}%) + estimated fees (~6%)`;
 
   // ===== Overall Advice =====
   const adviceBox = document.getElementById("overallAdvice");
@@ -289,37 +300,33 @@ function calcLoanLive() {
   const badCount = [boxCap, boxLoan, boxTotal].filter(b => b.classList.contains("bad")).length;
   const cautionCount = [boxCap, boxLoan, boxTotal].filter(b => b.classList.contains("caution")).length;
 
-  if (badCount >= 2 || (badCount >= 1 && monthly > loanLimit * 1.5)) {
+  if (badCount >= 2 || (badCount >= 1 && monthly > loanLimit * 1.3)) {
     adviceBox.classList.add("bad");
     adviceTitle.textContent = "Not Recommended";
-    adviceDesc.textContent = "The property price and/or monthly payment are significantly higher than the comfortable limits for this salary.";
+    adviceDesc.textContent = "The property price and/or monthly payment are significantly higher than typical bank comfort levels for this salary.";
   } else if (badCount === 1 || cautionCount >= 2) {
     adviceBox.classList.add("caution");
     adviceTitle.textContent = "Caution – Review Carefully";
-    adviceDesc.textContent = "Some numbers are above the comfortable range. Consider a lower loan amount or longer discussion with the bank.";
+    adviceDesc.textContent = "Some numbers are above the comfortable range. Discuss with the bank or consider adjusting the loan amount.";
   } else {
     adviceBox.classList.add("good");
     adviceTitle.textContent = "Looks Manageable";
-    adviceDesc.textContent = "Based on the guidelines, this loan appears to be within a reasonable range for the stated salary.";
+    adviceDesc.textContent = "Based on common Malaysian bank practice, this loan appears to be within a reasonable range for the stated salary.";
   }
 }
-
-// Live update on input
-["monthlySalary","otherIncome","loanAmount","interestRate","loanYears","simPropertyPrice"].forEach(id => {
-  document.getElementById(id)?.addEventListener("input", calcLoanLive);
-});
-
-// ====================== ENTRY ======================
+// ===== ENTRY COST (updated with LTV) =====
 document.getElementById("calcEntryBtn")?.addEventListener("click", function() {
   const price = parseFloat(document.getElementById("entryPrice").value) || 0;
-  const downPct = parseFloat(document.getElementById("downPercent").value) || 10;
-  const loan = parseFloat(document.getElementById("entryLoan").value) || 0;
-  const downPayment = price * (downPct / 100);
+  const ltv = parseFloat(document.getElementById("entryLtv").value) || 0.90;
+  const loan = parseFloat(document.getElementById("entryLoan").value) || (price * ltv);
+
+  const downPayment = price * (1 - ltv);
   let stampDuty = 0;
   if (price <= 100000) stampDuty = price * 0.01;
   else if (price <= 500000) stampDuty = 1000 + (price - 100000) * 0.02;
   else if (price <= 1000000) stampDuty = 9000 + (price - 500000) * 0.03;
   else stampDuty = 24000 + (price - 1000000) * 0.04;
+
   const loanStamp = loan * 0.005;
   const legalFee = price * 0.012;
   const valuation = Math.min(Math.max(price * 0.002, 800), 2500);
@@ -327,7 +334,7 @@ document.getElementById("calcEntryBtn")?.addEventListener("click", function() {
 
   document.getElementById("totalCash").textContent = formatMoney(total);
   document.getElementById("entryBreakdown").innerHTML = `
-    <tr><td>Down Payment (${downPct}%)</td><td>${formatMoney(downPayment)}</td></tr>
+    <tr><td>Down Payment (${((1-ltv)*100).toFixed(0)}%)</td><td>${formatMoney(downPayment)}</td></tr>
     <tr><td>Stamp Duty (MOT)</td><td>${formatMoney(stampDuty)}</td></tr>
     <tr><td>Loan Stamp Duty (0.5%)</td><td>${formatMoney(loanStamp)}</td></tr>
     <tr><td>Legal Fees (est.)</td><td>${formatMoney(legalFee)}</td></tr>
@@ -336,7 +343,7 @@ document.getElementById("calcEntryBtn")?.addEventListener("click", function() {
   document.getElementById("entryResult").style.display = "block";
 });
 
-// ====================== EXIT COST ======================
+// ===== EXIT COST =====
 document.getElementById("calcExitBtn")?.addEventListener("click", function() {
   const sell = parseFloat(document.getElementById("exitPrice").value) || 0;
   const purchase = parseFloat(document.getElementById("exitPurchase").value) || 0;
@@ -345,16 +352,15 @@ document.getElementById("calcExitBtn")?.addEventListener("click", function() {
   const commissionPct = parseFloat(document.getElementById("exitCommission").value) || 2.5;
 
   const gain = Math.max(sell - purchase, 0);
-  // Simplified RPGT for Malaysian citizen (approx)
   let rpgtRate = 0;
   if (years <= 3) rpgtRate = 0.30;
   else if (years <= 4) rpgtRate = 0.20;
   else if (years <= 5) rpgtRate = 0.15;
-  else rpgtRate = 0; // after 5 years often 0% for citizen on residential (simplified)
+  else rpgtRate = 0;
 
   const rpgt = gain * rpgtRate;
   const agentFee = sell * (commissionPct / 100);
-  const legalFee = sell * 0.01; // rough
+  const legalFee = sell * 0.01;
   const totalCost = rpgt + agentFee + legalFee;
   const net = sell - outstanding - totalCost;
 
@@ -367,6 +373,96 @@ document.getElementById("calcExitBtn")?.addEventListener("click", function() {
     <tr><td>Less: Legal Fee (est.)</td><td>${formatMoney(legalFee)}</td></tr>
     <tr style="font-weight:700;"><td>Net Cash You Receive</td><td>${formatMoney(net)}</td></tr>`;
   document.getElementById("exitResult").style.display = "block";
+});
+
+// ===== FULL REPORT (Improved) =====
+document.getElementById("generateReportBtn")?.addEventListener("click", function() {
+  const name = document.getElementById("reportName").value || "Property Report";
+  const price = parseFloat(document.getElementById("reportPrice").value) || 0;
+  const size = parseFloat(document.getElementById("reportSize").value) || 0;
+
+  // Pull latest values from other modules
+  const monthlyPayment = document.getElementById("monthlyPayment")?.textContent || "-";
+  const totalPayment = document.getElementById("totalPayment")?.textContent || "-";
+  const totalInterest = document.getElementById("totalInterest")?.textContent || "-";
+  const dsrValue = document.getElementById("dsrValue")?.textContent || "-";
+  const dsrStatus = document.getElementById("dsrStatus")?.textContent || "-";
+  const totalCash = document.getElementById("totalCash")?.textContent || "-";
+  const netYield = document.getElementById("netYield")?.textContent || "-";
+  const netCashFlow = document.getElementById("netCashFlow")?.textContent || "-";
+  const renoRange = document.getElementById("totalRange")?.textContent || "-";
+  const adviceTitle = document.getElementById("adviceTitle")?.textContent || "-";
+  const adviceDesc = document.getElementById("adviceDesc")?.textContent || "";
+
+  // Simple overall recommendation logic
+  let overallStatus = "Review Required";
+  let overallColor = "#eab308";
+  let overallComment = "Please review the numbers carefully with the customer.";
+
+  const dsrNum = parseFloat(dsrValue) || 100;
+  const yieldNum = parseFloat(netYield) || 0;
+
+  if (dsrNum <= 60 && yieldNum >= 3.5 && adviceTitle.includes("Manageable")) {
+    overallStatus = "Healthy to Buy / Invest";
+    overallColor = "#16a34a";
+    overallComment = "Based on current numbers, this property looks manageable for the stated income and offers a reasonable rental yield.";
+  } else if (dsrNum <= 70 && yieldNum >= 3.0) {
+    overallStatus = "Okay with Caution";
+    overallColor = "#ca8a04";
+    overallComment = "Acceptable range, but monitor cash flow and existing commitments carefully.";
+  } else {
+    overallStatus = "Not Recommended";
+    overallColor = "#dc2626";
+    overallComment = "The loan burden or yield may not be ideal. Consider adjusting price, loan amount or looking at other units.";
+  }
+
+  const html = `
+    <div style="line-height:1.7; font-size:15px;">
+      <h3 style="margin:0 0 6px 0;">${name}</h3>
+      <p style="margin:0 0 4px 0;"><strong>Property Price:</strong> ${formatMoney(price)}</p>
+      <p style="margin:0 0 16px 0;"><strong>Size:</strong> ${size} sqft ${size > 0 ? `(${formatMoney(price/size)} / sqft)` : ""}</p>
+
+      <!-- Overall Recommendation -->
+      <div style="background:${overallColor}15; border:1px solid ${overallColor}; border-radius:10px; padding:14px 16px; margin-bottom:20px;">
+        <div style="font-size:18px; font-weight:700; color:${overallColor}; margin-bottom:4px;">
+          ${overallStatus}
+        </div>
+        <div style="font-size:14px; color:#334155;">
+          ${overallComment}
+        </div>
+      </div>
+
+      <h4 style="margin:18px 0 6px 0; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">1. Renovation Estimate</h4>
+      <p style="margin:0;">Estimated Range: <strong>${renoRange}</strong></p>
+      <p style="margin:4px 0 0 0; font-size:13px; color:#64748b;">Pre-site visit estimate. Actual quotation may vary ±15–30%.</p>
+
+      <h4 style="margin:18px 0 6px 0; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">2. Loan & DSR</h4>
+      <p style="margin:0;">Monthly Payment: <strong>${monthlyPayment}</strong></p>
+      <p style="margin:4px 0;">Total Payment: ${totalPayment}</p>
+      <p style="margin:4px 0;">Total Interest: ${totalInterest}</p>
+      <p style="margin:4px 0;">DSR: <strong>${dsrValue}</strong> <span style="color:#64748b;">(${dsrStatus})</span></p>
+      <p style="margin:4px 0 0 0; font-size:13px; color:#64748b;">Loan Advice: ${adviceTitle}</p>
+
+      <h4 style="margin:18px 0 6px 0; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">3. Entry Cost (Cash Needed)</h4>
+      <p style="margin:0;"><strong>${totalCash}</strong></p>
+      <p style="margin:4px 0 0 0; font-size:13px; color:#64748b;">Includes down payment, stamp duty, legal fees & valuation.</p>
+
+      <h4 style="margin:18px 0 6px 0; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">4. Rental Yield</h4>
+      <p style="margin:0;">Net Yield: <strong>${netYield}</strong></p>
+      <p style="margin:4px 0;">Net Monthly Cash Flow: ${netCashFlow}</p>
+      <p style="margin:4px 0 0 0; font-size:13px; color:#64748b;">Good net yield for condos in Malaysia is generally 3.5% – 5%.</p>
+
+      <hr style="margin:24px 0 12px 0; border:none; border-top:1px solid #e2e8f0;">
+      <p style="font-size:12px; color:#64748b; margin:0;">
+        This report is a pre-site estimate for discussion purposes only. 
+        Actual loan approval, renovation cost and rental income may differ. 
+        Please verify with the bank, contractor and property agent.
+      </p>
+    </div>
+  `;
+
+  document.getElementById("reportContent").innerHTML = html;
+  document.getElementById("fullReportResult").style.display = "block";
 });
 
 // ====================== RENTAL ======================
@@ -465,5 +561,15 @@ document.addEventListener("DOMContentLoaded", () => {
   renderCommitments();
   renderCompareInputs();
   document.getElementById("calculateBtn")?.addEventListener("click", calculate);
-  calcLoanLive(); // initial loan calculation
+
+  // Live update on input (Loan Simulator)
+  ["monthlySalary", "otherIncome", "loanAmount", "interestRate", "loanYears", "simPropertyPrice", "ltvSelect"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", calcLoanLive);
+      el.addEventListener("change", calcLoanLive);
+    }
+  });
+
+  calcLoanLive(); // run once when page loads
 });
